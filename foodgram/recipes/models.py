@@ -1,6 +1,5 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import UniqueConstraint
 
 from users.models import CustomUser
 
@@ -13,7 +12,7 @@ class Ingredient(models.Model):
         verbose_name='Название',
         null=False
         )
-    unit_measure = models.CharField(
+    measurement_unit = models.CharField(
         max_length=20,
         verbose_name='Единица измерения',
         null=False
@@ -25,7 +24,7 @@ class Ingredient(models.Model):
         ordering = ['title']
 
     def __str__(self):
-        return f'{self.title} ({self.unit_measure}).'
+        return f'{self.title} ({self.measurement_unit}).'
 
 
 class Tag(models.Model):
@@ -41,6 +40,11 @@ class Tag(models.Model):
         default='#ffffff',
         verbose_name='Цвет тэга'
         )
+    slug = models.SlugField(
+        'Slug тега',
+        max_length=200,
+        unique=True,
+    )
 
     class Meta:
         verbose_name = 'Тэг'
@@ -142,7 +146,10 @@ class FavoriteRecipe(models.Model):
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
-        UniqueConstraint(fields=['recipe', 'user'], name='favorite_unique')
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique favourite')]
 
     def __str__(self):
         return f'Избранный рецепт: "{self.user}"'

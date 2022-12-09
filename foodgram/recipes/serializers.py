@@ -25,7 +25,7 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
         source='ingredient', read_only=True
     )
     unit_measure = serializers.SlugRelatedField(
-        slug_field='unit_measure',
+        slug_field='measurement_unit',
         source='ingredient', read_only=True
     )
 
@@ -153,19 +153,31 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         return instance
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        for i in ingredients:
-            if int(i['number']) <= 0:
-                raise serializers.ValidationError({
-                    'ingredients': ('Количество ингредиентов должно быть > 0')
-                })
-        return data
-
-    def validate_time_cook(self, data):
-        time_cook = self.initial_data.get('time_cook')
-        if int(time_cook) <= 0:
+        ingredients = data.get('ingredients')
+        for ingredient in ingredients:
+            if not Ingredient.objects.filter(
+                    id=ingredient['id']).exists():
+                raise serializers.ValidationError(
+                    {'ingredients': f'Нет ингредиента с id {ingredient["id"]}'}
+                )
+        tag = data.get('tag')
+        if len(tag) != len(set([item for item in tag])):
             raise serializers.ValidationError(
-                'Время приготовления должно быть > 0'
+                {'tag': 'Тэги не могут повторяться'}
+            )
+        if len(ingredients) != len(set([item['id'] for item in ingredients])):
+            raise serializers.ValidationError(
+                'Ингредиенты не должны повторяться'
+            )
+        time_cook = data.get('time_cook')
+        if time_cook > 300 or time_cook < 1:
+            raise serializers.ValidationError(
+                {'time_cook': 'Время приготовления от 1 до 300 минут'}
+            )
+        quantity = data.get('ingredients')
+        if [item for item in quantity if item['quantity'] < 1]:
+            raise serializers.ValidationError(
+                {'quantity': 'Минимальное количество ингредиентов = 1'}
             )
         return data
 

@@ -42,11 +42,7 @@ class FollowApiView(APIView):
         }
         serializer = UserFollowSerializer(data=data,
                                           context={'request': request})
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

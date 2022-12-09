@@ -32,3 +32,17 @@ class Follow(models.Model):
         related_name='follower',
         verbose_name='Подписчик'
     )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                name='Ограничение на единственную связь',
+                fields=['user', 'following'],
+            ),
+            models.CheckConstraint(
+                name='Ограничение на самоподписку',
+                check=~models.Q(following=models.F('user')),
+            ),
+        ]
