@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from users.serializers import CurrentUserSerializer
 from .models import (
     Ingredient, IngredintsNumber, FavoriteRecipe, Recipe, Shop, Tag
-    )
+)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
