@@ -158,7 +158,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
             if not Ingredient.objects.filter(
                     id=ingredient['id']).exists():
                 raise serializers.ValidationError(
-                    {'ingredients': f'Нет ингредиента с id {ingredient["id"]}'}
+                    {'ingredients': 'Данного ингридиента нет в базе'}
                 )
         tag = data.get('tag')
         if len(tag) != len(set([item for item in tag])):
@@ -182,11 +182,11 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         return data
 
     def representation(self, instance):
-        data = RecipeSerializer(
+        Data = RecipeSerializer(
             instance,
             context={'request': self.context.get('request')}
         ).data
-        return data
+        return Data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
