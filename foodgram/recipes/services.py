@@ -9,8 +9,7 @@ from reportlab.pdfgen import canvas
 def download_file(dictionary):
     response = HttpResponse(content_type='application/pdf')
     response[
-        'Content-Disposition'] = 'attachment; \
-    filename = "shopping_cart.pdf"'
+        'Content-Disposition'] = 'attachment; filename = "shopping_cart.pdf"'
     begin_position_x, begin_position_y = 40, 50
     leaf = canvas.Canvas(response, pagesize=A4)
     pdfmetrics.registerFont(TTFont('FreeSans', 'data/FreeSas.ttf'))
