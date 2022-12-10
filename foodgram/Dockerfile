@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY foodgram/requirements.txt pwd
 
-RUN pip3 install --upgrade pip && pip3 install -r /app/foodgram/requirements.txt --no-cache-dir
+RUN pip3 install -r requirements.txt --no-cache-dir
 
 COPY . .
 
