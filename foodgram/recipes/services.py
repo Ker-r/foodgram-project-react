@@ -8,7 +8,7 @@ from reportlab.pdfgen import canvas
 @staticmethod
 def download_file(dictionary):
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment;
+    response['Content-Disposition'] = 'attachment; \
     filename="ShopList.pdf"'
     begin_position_x, begin_position_y = 40, 50
     leaf = canvas.Canvas(response, pagesize=A4)
