@@ -182,11 +182,10 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         return data
 
     def representation(self, instance):
-        data_1 = RecipeSerializer(
+        return RecipeSerializer(
             instance,
             context={'request': self.context.get('request')}
         ).data
-        return data_1
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
