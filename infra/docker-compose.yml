@@ -5,7 +5,7 @@ services:
     image: postgres:13.0-alpine
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - db_value:/var/lib/postgresql/data/
     env_file:
       - ./.env
 
@@ -36,7 +36,7 @@ services:
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static/
-      - media_value:/var/html/media/recipes/
+      - media_value:/var/html/media/
     depends_on:
       - frontend
 
