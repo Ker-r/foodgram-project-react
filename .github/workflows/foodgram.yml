@@ -39,7 +39,7 @@ jobs:
         with:
           push: true
           tags: karolinaefr/foodgram:latest
-          file: foodgram/Dockerfile 
+          context: ./foodgram/
   
   deploy:
     runs-on: ubuntu-latest
