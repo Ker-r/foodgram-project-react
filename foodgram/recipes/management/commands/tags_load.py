@@ -6,10 +6,11 @@ from recipes.models import Tag
 
 
 class Command(BaseCommand):
+    help = 'Load tags data from csv-file to DB.'
 
     def handle(self, *args, **kwargs):
         with open(
-                'data/recipes_tag.csv', 'r',
+                'recipes/data/recipes_tag.csv', 'r',
                 encoding='UTF-8'
         ) as tags:
             for row in reader(tags):
