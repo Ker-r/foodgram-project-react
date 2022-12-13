@@ -26,9 +26,9 @@ http://158.160.18.236/signin
 - docker-compose up -d --build # пересборка контейнера
 
 ### описание команды для заполнения базы данными
-- sudo docker-compose exec web python manage.py makemigrations recipes
-- sudo docker-compose exec web python manage.py makemigrations users
-- sudo docker-compose exec web python manage.py migrate
+- sudo docker-compose exec backend python manage.py makemigrations recipes
+- sudo docker-compose exec backend python manage.py makemigrations users
+- sudo docker-compose exec backend python manage.py migrate
 
 ### Тестовый пользователь 
 Суперюзер
