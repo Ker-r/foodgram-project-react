@@ -31,7 +31,7 @@ class CustomUser(AbstractUser):
         help_text= ('Укажите свой ник'),
     )
     first_name = models.CharField(
-        verbose_name=_('Имя'),
+        verbose_name= ('Имя'),
         max_length=150,
         blank=True,
         help_text= ('Укажите своё имя'),
