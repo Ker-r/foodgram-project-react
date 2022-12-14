@@ -38,5 +38,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://158.160.18.236:8000/"
+  "proxy": "http://web:8000/"
 }
