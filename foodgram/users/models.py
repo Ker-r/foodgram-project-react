@@ -12,50 +12,50 @@ class CustomUser(AbstractUser):
         (ADMIN, 'admin'),
     }
     email = models.EmailField(
-        verbose_name= ('Адрес email'),
+        verbose_name=('Адрес email'),
         max_length=254,
         unique=True,
         blank=False,
         error_messages={
             'unique': ('Пользователь с таким email уже существует!'),
         },
-        help_text= ('Укажите email'),
+        help_text=('Укажите email'),
     )
     username = models.CharField(
-        verbose_name= ('Логин'),
+        verbose_name=('Логин'),
         max_length=150,
         unique=True,
         error_messages={
             'unique': ('Пользователь с таким ником уже существует!'),
         },
-        help_text= ('Укажите свой ник'),
+        help_text=('Укажите свой ник'),
     )
     first_name = models.CharField(
-        verbose_name= ('Имя'),
+        verbose_name=('Имя'),
         max_length=150,
         blank=True,
-        help_text= ('Укажите своё имя'),
+        help_text=('Укажите своё имя'),
     )
     last_name = models.CharField(
-        verbose_name= ('Фамилия'),
+        verbose_name=('Фамилия'),
         max_length=150,
         blank=True,
-        help_text= ('Укажите свою фамилию'),
+        help_text=('Укажите свою фамилию'),
     )
     role = models.CharField(
-        verbose_name= ('статус'),
+        verbose_name=('статус'),
         max_length=20,
         choices=ROLES,
         default=USER,
     )
     date_joined = models.DateTimeField(
-        verbose_name= ('Дата регистрации'),
+        verbose_name=('Дата регистрации'),
         auto_now_add=True,
     )
     password = models.CharField(
-        verbose_name= ('Пароль'),
+        verbose_name=('Пароль'),
         max_length=150,
-        help_text= ('Введите пароль'),
+        help_text=('Введите пароль'),
     )
 
     class Meta:
