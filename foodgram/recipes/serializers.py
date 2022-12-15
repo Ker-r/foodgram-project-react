@@ -24,7 +24,7 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
         slug_field='name',
         source='ingredient', read_only=True
     )
-    unit_measure = serializers.SlugRelatedField(
+    measurement_unit = serializers.SlugRelatedField(
         slug_field='measurement_unit',
         source='ingredient', read_only=True
     )
