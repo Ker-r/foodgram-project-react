@@ -33,6 +33,7 @@ http://158.160.18.236/signin
 - sudo docker-compose exec backend python manage.py createsuperuser
 - sudo docker-compose exec backend python manage.py ingredients_load
 - sudo docker-compose exec backend python manage.py tags_load
+- sudo docker-compose exec backend python manage.py dumpdata > fixtures.json
 
 ### Тестовый пользователь 
 Суперюзер
