@@ -47,7 +47,7 @@ class RecipeAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         return queryset.annotate(
             obj_count=Count(
-                'favorite_recipe', distinct=True
+                'recipe_favorite', distinct=True
             )
         )
 
