@@ -24,6 +24,8 @@ services:
     image: karolinaefr/foodgram-frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
   
   nginx:
     image: nginx:1.19.3
@@ -37,7 +39,6 @@ services:
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
-      - backend
       - frontend
 
 
