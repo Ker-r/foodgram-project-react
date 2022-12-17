@@ -26,11 +26,11 @@ http://84.201.143.128/
 - docker-compose up -d --build # пересборка контейнера
 
 ### описание команды для заполнения базы данными
-- sudo docker-compose exec backend python manage.py collectstatic --no-input
 - sudo docker-compose exec backend python manage.py makemigrations recipes
 - sudo docker-compose exec backend python manage.py makemigrations users
 - sudo docker-compose exec backend python manage.py migrate
 - sudo docker-compose exec backend python manage.py createsuperuser
+- sudo docker-compose exec backend python manage.py collectstatic --no-input
 - sudo docker-compose exec backend python manage.py ingredients_load
 - sudo docker-compose exec backend python manage.py tags_load
 - sudo docker-compose exec backend python manage.py dumpdata > fixtures.json
