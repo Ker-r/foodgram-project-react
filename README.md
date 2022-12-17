@@ -1,6 +1,6 @@
 [![Foodgram workflow](https://github.com/Ker-r/foodgram-project-react/actions/workflows/foodgram.yml/badge.svg)](https://github.com/Ker-r/foodgram-project-react/actions/workflows/foodgram.yml)
 
-http://158.160.18.236/signin
+http://84.201.143.128/
 
 ## Описание проекта 
 Приложение «Продуктовый помощник»: сайт, на котором пользователи могут публиковать рецепты, добавлять чужие рецепты в избранное и подписываться на публикации других авторов, а также создавать список покупок и загружать его в pdf формате.
