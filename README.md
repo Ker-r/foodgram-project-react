@@ -40,4 +40,3 @@ http://84.201.143.128/
 Username: Ker
 Email: ker.stiv@yandex.ru
 Password: Admin12345
-
