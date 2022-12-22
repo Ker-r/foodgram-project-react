@@ -35,7 +35,6 @@ http://84.201.143.128/
 - sudo docker-compose exec backend python manage.py tags_load
 - sudo docker-compose exec backend python manage.py dumpdata > fixtures.json
 
-
 ### Тестовый пользователь 
 Суперюзер
 Username: Ker
