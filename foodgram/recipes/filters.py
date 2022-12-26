@@ -4,7 +4,7 @@ from .models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(filters.FilterSet):
-    tags = filters.ModelMultipleChoiceFilter(
+    tag = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         queryset=Tag.objects.all(),
         to_field_name='slug',
@@ -18,7 +18,7 @@ class RecipeFilter(filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('tags', 'author', 'favorite', 'shop')
+        fields = ('tag', 'author', 'favorite', 'shop')
 
     def get_favorite(self, queryset, name, value):
         user = self.request.user
