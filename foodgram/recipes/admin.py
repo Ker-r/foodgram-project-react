@@ -3,7 +3,7 @@ from django.db.models import Count
 
 from .models import (
     Ingredient,
-    IngredintsNumber,
+    IngredientAmount,
     FavoriteRecipe,
     Recipe,
     Shop,
@@ -25,13 +25,13 @@ class IngredientAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-class IngredientNumberAdmin(admin.TabularInline):
-    model = IngredintsNumber
+class IngredientAmountAdmin(admin.TabularInline):
+    model = IngredientAmount
     autocomplete_fields = ('ingredient', )
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    inlines = (IngredientNumberAdmin,)
+    inlines = (IngredientAmountAdmin,)
     list_display = (
         'id', 'name', 'author', 'description', 'pub_date', 'favorite_count'
     )

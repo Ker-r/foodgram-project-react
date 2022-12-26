@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from users.serializers import CurrentUserSerializer
 from .models import (
-    Ingredient, IngredintsNumber, FavoriteRecipe, Recipe, Shop, Tag
+    Ingredient, IngredientAmount, FavoriteRecipe, Recipe, Shop, Tag
 )
 
 
@@ -30,7 +30,7 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = IngredintsNumber
+        model = IngredientAmount
         fields = ('__all__')
 
 
@@ -42,7 +42,7 @@ class AddIngredientNumderSerializer(serializers.ModelSerializer):
     number = serializers.IntegerField()
 
     class Meta:
-        model = IngredintsNumber
+        model = IngredientAmount
         fields = ('__all__')
 
 
@@ -118,8 +118,8 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         )
 
     def create_bulk(self, recipe, ingredients_data):
-        IngredintsNumber.objects.bulk_create(
-            [IngredintsNumber(
+        IngredientAmount.objects.bulk_create(
+            [IngredientAmount(
                 ingredient=ingredient['ingredient'],
                 recipe=recipe,
                 number=ingredient['number']
@@ -141,7 +141,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-        IngredintsNumber.objects.filter(recipe=instance).delete()
+        IngredientAmount.objects.filter(recipe=instance).delete()
         self.create_bulk(instance, ingredients_data)
         instance.name = validated_data.pop('name')
         instance.description = validated_data.pop('description')

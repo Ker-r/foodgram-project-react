@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from .filters import IngredientFilter, RecipeFilter
 from .models import (
-    FavoriteRecipe, Ingredient, IngredintsNumber,
+    FavoriteRecipe, Ingredient, IngredientAmount,
     Recipe, Shop, Tag
 )
 from .permissions import IsOwnerOrRead
@@ -105,7 +105,7 @@ class DownloadShop(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        ingredients = IngredintsNumber.objects.filter(
+        ingredients = IngredientAmount.objects.filter(
             recipe__shop__user=request.user).values(
                 'ingredient__name', 'ingredient__measurement_unit').order_by(
                     'ingredient__name').annotate(
