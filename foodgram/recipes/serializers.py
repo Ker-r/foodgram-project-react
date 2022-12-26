@@ -20,8 +20,8 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         source='ingredient', read_only=True
     )
-    name = serializers.SlugRelatedField(
-        slug_field='name',
+    title = serializers.SlugRelatedField(
+        slug_field='title',
         source='ingredient', read_only=True
     )
     measurement_unit = serializers.SlugRelatedField(
