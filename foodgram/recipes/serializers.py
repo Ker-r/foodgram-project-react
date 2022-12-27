@@ -108,7 +108,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
     tag = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
-    cooking_time  = serializers.IntegerField()
+    cooking_time = serializers.IntegerField()
 
     class Meta:
         model = Recipe
