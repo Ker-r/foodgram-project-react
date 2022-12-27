@@ -21,10 +21,10 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-        ordering = ['title']
+        ordering = ['name']
 
     def __str__(self):
-        return f'{self.title} ({self.measurement_unit}).'
+        return f'{self.name} ({self.measurement_unit}).'
 
 
 class Tag(models.Model):
