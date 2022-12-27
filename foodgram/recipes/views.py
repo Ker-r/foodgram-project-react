@@ -109,5 +109,5 @@ class DownloadShop(APIView):
             recipe__shop__user=request.user).values(
                 'ingredient__name', 'ingredient__measurement_unit').order_by(
                     'ingredient__name').annotate(
-                        ingredient_total=Sum('quantity'))
+                        ingredient_total=Sum('amount'))
         return download_file(ingredients)

@@ -7,7 +7,7 @@ User = CustomUser
 
 
 class Ingredient(models.Model):
-    title = models.CharField(
+    name = models.CharField(
         max_length=200,
         verbose_name='Название',
         null=False
@@ -78,14 +78,14 @@ class Recipe(models.Model):
         Ingredient,
         through='IngredientAmount',
         related_name='ingredients',
-        verbose_name='Ингридиенты'
+        verbose_name='Ингредиенты'
     )
     tag = models.ManyToManyField(
         Tag,
         related_name='tag',
         verbose_name='Тэг'
     )
-    time_cook = models.PositiveSmallIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления, мин.',
         validators=[MinValueValidator(1, 'Значение не может быть < 1')],
         default=1
@@ -116,7 +116,7 @@ class IngredientAmount(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
     )
-    quantity = models.PositiveSmallIntegerField(
+    amount = models.PositiveSmallIntegerField(
         default=1,
         validators=[MinValueValidator(1)],
         verbose_name='Количество ингредиентов'

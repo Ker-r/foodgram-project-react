@@ -19,9 +19,9 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'measurement_unit',)
-    search_fields = ('title',)
-    list_filter = ('title',)
+    list_display = ('id', 'name', 'measurement_unit',)
+    search_fields = ('name',)
+    list_filter = ('name',)
     empty_value_display = '-пусто-'
 
 

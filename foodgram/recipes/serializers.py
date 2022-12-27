@@ -21,7 +21,7 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
         source='ingredient', read_only=True
     )
     title = serializers.SlugRelatedField(
-        slug_field='title',
+        slug_field='name',
         source='ingredient', read_only=True
     )
     measurement_unit = serializers.SlugRelatedField(
@@ -65,7 +65,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id', 'tag', 'author', 'ingredients', 'favorite',
-            'shop', 'name', 'description', 'time_cook'
+            'shop', 'name', 'description', 'cooking_time'
         )
 
     def get_ingredient(self, obj):
@@ -93,7 +93,7 @@ class RecipeImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'time_cook')
+        fields = ('id', 'name', 'image', 'cooking_time ')
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -108,13 +108,13 @@ class RecipeFullSerializer(serializers.ModelSerializer):
     tag = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
-    time_cook = serializers.IntegerField()
+    cooking_time  = serializers.IntegerField()
 
     class Meta:
         model = Recipe
         fields = (
             'id', 'image', 'tag', 'author', 'ingredients', 'name',
-            'description', 'time_cook'
+            'description', 'cooking_time '
         )
 
     def create_bulk(self, recipe, ingredients_data):
@@ -145,7 +145,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         self.create_bulk(instance, ingredients_data)
         instance.name = validated_data.pop('name')
         instance.description = validated_data.pop('description')
-        instance.time_cook = validated_data.pop('time_cook')
+        instance.cooking_time = validated_data.pop('cooking_time')
         if validated_data.get('image') is not None:
             instance.image = validated_data.pop('image')
         instance.save()
@@ -169,15 +169,15 @@ class RecipeFullSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Ингредиенты не должны повторяться'
             )
-        time_cook = data.get('time_cook')
-        if time_cook > 300 or time_cook < 1:
+        cooking_time = data.get('cooking_time')
+        if cooking_time > 300 or cooking_time < 1:
             raise serializers.ValidationError(
-                {'time_cook': 'Время приготовления от 1 до 300 минут'}
+                {'cooking_time': 'Время приготовления от 1 до 300 минут'}
             )
-        quantity = data.get('ingredients')
-        if [item for item in quantity if item['quantity'] < 1]:
+        amount = data.get('ingredients')
+        if [item for item in amount if item['amount'] < 1]:
             raise serializers.ValidationError(
-                {'quantity': 'Минимальное количество ингредиентов = 1'}
+                {'amount': 'Минимальное количество ингредиентов = 1'}
             )
         return data
 
