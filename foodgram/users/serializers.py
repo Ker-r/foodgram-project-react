@@ -81,19 +81,19 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
-    is_signed = serializers.SerializerMethodField()
+    is_signed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'is_signed', 'password'
+            'is_signed'
         )
-        extra_kwargs = {"password": {'write_only': True}}
 
     def get_is_signed(self, obj):
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
+        if not request or request.user.is_anonymous:
             return False
         user = request.user
-        return Follow.objects.filter(following=obj, user=user).exists()
+        return Follow.objects.filter(user=self.context['request'].user,
+                                     author=obj).exists()
