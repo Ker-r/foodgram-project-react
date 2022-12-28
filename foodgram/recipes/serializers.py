@@ -3,6 +3,7 @@ from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
 
 
 from users.serializers import CurrentUserSerializer
@@ -187,35 +188,21 @@ class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
 
 class FavoriteSerializer(serializers.ModelSerializer):
 
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-    )
-    recipe = serializers.PrimaryKeyRelatedField(
-        queryset=Recipe.objects.all(),
-        write_only=True,
-    )
 
     class Meta:
-        model = FavoriteRecipe
         fields = ('user', 'recipe')
+        model = FavoriteRecipe
+        validators = [UniqueTogetherValidator(
+            queryset=FavoriteRecipe.objects.all(),
+            fields=('user', 'recipe'),
+            message='Рецепт уже добавлен в избранное'
+        )]
 
-    def validate(self, data):
-        user = data['user']
-        recipe_id = data['recipe'].id
-        if FavoriteRecipe.objects.filter(user=user,
-                                         recipe__id=recipe_id).exists():
-            raise ValidationError(
-                'Рецепт уже добавлен в избранное!'
-            )
-        return data
-
-    def to_representation(self, instance):
+    def representation(self, instance):
         request = self.context.get('request')
-        context = {'request': request}
-        return ShowFavoriteRecipeShopListSerializer(
+        return RecipeImageSerializer(
             instance.recipe,
-            context=context
+            context={'request': request}
         ).data
 
 
