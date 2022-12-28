@@ -188,7 +188,6 @@ class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
 
 class FavoriteSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         fields = ('user', 'recipe')
         model = FavoriteRecipe
