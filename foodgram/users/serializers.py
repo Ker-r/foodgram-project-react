@@ -95,4 +95,4 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         if not request or request.user.is_anonymous:
             return False
         return Follow.objects.filter(user=self.context['request'].user,
-                                     author=obj).exists()
+                                     following=obj).exists()
