@@ -69,7 +69,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id', 'tags', 'author', 'ingredients', 'favorite',
-            'shop', 'name', 'description', 'cooking_time'
+            'shop', 'name', 'text', 'cooking_time'
         )
 
     @staticmethod
@@ -106,7 +106,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id', 'image', 'tags', 'author', 'ingredients', 'name',
-            'description', 'cooking_time'
+            'text', 'cooking_time'
         )
 
     def validate(self, data):

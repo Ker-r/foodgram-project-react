@@ -66,11 +66,11 @@ class Recipe(models.Model):
         verbose_name='Название',
         null=False
     )
-    images = models.ImageField(
+    image = models.ImageField(
         verbose_name='Картинка',
         upload_to='media/'
     )
-    description = models.TextField(
+    text = models.TextField(
         max_length=2000,
         verbose_name='Описание'
     )

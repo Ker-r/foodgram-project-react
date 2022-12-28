@@ -33,7 +33,7 @@ class IngredientAmountAdmin(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (IngredientAmountAdmin,)
     list_display = (
-        'id', 'name', 'author', 'description', 'pub_date', 'favorite_count'
+        'id', 'name', 'author', 'text', 'pub_date', 'favorite_count'
     )
     search_fields = ('name', 'author', 'tags')
     list_filter = ('name', 'author', 'tags', 'pub_date')
