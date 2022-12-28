@@ -35,9 +35,9 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'name', 'author', 'description', 'pub_date', 'favorite_count'
     )
-    search_fields = ('name', 'author', 'tag')
-    list_filter = ('name', 'author', 'tag', 'pub_date')
-    filter_vertical = ('tag',)
+    search_fields = ('name', 'author', 'tags')
+    list_filter = ('name', 'author', 'tags', 'pub_date')
+    filter_vertical = ('tags',)
     empty_value_display = '-пусто-'
 
     def favorite_count(self, obj):

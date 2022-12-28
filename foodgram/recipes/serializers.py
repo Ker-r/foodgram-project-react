@@ -68,7 +68,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tag', 'author', 'ingredients', 'favorite',
+            'id', 'tags', 'author', 'ingredients', 'favorite',
             'shop', 'name', 'description', 'cooking_time'
         )
 
@@ -105,7 +105,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'image', 'tag', 'author', 'ingredients', 'name',
+            'id', 'image', 'tags', 'author', 'ingredients', 'name',
             'description', 'cooking_time'
         )
 
@@ -117,10 +117,10 @@ class RecipeFullSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {'ingredients': 'Данного ингридиента нет в базе'}
                 )
-        tag = data.get('tag')
-        if len(tag) != len(set([item for item in tag])):
+        tags = data.get('tags')
+        if len(tags) != len(set([item for item in tags])):
             raise serializers.ValidationError(
-                {'tag': 'Тэги не могут повторяться'}
+                {'tags': 'Тэги не могут повторяться'}
             )
         if len(ingredients) != len(set([item['id'] for item in ingredients])):
             raise serializers.ValidationError(
@@ -153,7 +153,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         author = self.context.get('request').user
-        tags_data = validated_data.pop('tag')
+        tags_data = validated_data.pop('tags')
         ingredient_data = validated_data.pop('ingredients')
         image = validated_data.pop('image')
         recipe = Recipe.objects.create(image=image, author=author,
