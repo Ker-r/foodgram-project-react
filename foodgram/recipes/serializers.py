@@ -159,7 +159,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(image=image, author=author,
                                        **validated_data)
         self.add_ingredients(ingredient_data, recipe)
-        recipe.tag.set(tags_data)
+        recipe.tags.set(tags_data)
         return recipe
 
     def update(self, recipe, validated_data):
