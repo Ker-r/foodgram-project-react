@@ -34,6 +34,7 @@ http://84.201.143.128/
 - sudo docker-compose exec backend python manage.py ingredients_load
 - sudo docker-compose exec backend python manage.py tags_load
 
+
 ### Тестовый пользователь 
 Суперюзер
 Username: Ker
