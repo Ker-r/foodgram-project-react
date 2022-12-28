@@ -114,7 +114,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id', 'image', 'tag', 'author', 'ingredients', 'name',
-            'description', 'cooking_time '
+            'description', 'cooking_time'
         )
 
     def create_bulk(self, recipe, ingredients_data):
