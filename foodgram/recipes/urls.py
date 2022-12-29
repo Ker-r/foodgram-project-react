@@ -8,9 +8,9 @@ from .views import (
 
 
 router = DefaultRouter()
-router.register('recipes', RecipeViewSet)
-router.register('ingredients', IngredientViewSet, basename='ingredients')
-router.register('tags', TagViewSet, basename='tags')
+router.register(r'recipes', RecipeViewSet)
+router.register(r'ingredients', IngredientViewSet, basename='ingredients')
+router.register(r'tags', TagViewSet, basename='tags')
 
 urlpatterns = [
     path('recipes/download_shopping_cart/', DownloadShop.as_view()),

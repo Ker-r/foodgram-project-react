@@ -95,7 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeFullSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     author = CurrentUserSerializer(read_only=True)
-    ingredients = IngredientNumderSerializer(read_only=True, many=True, source='ingredientamount_set')
+    ingredients = AddIngredientNumderSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
@@ -110,7 +110,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        ingredients = data.get('ingredientamount_set')
+        ingredients = data.get('ingredients')
         for ingredient in ingredients:
             if not Ingredient.objects.filter(
                     id=ingredient['id']).exists():
@@ -169,6 +169,12 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         self.add_ingredients(ingredients, recipe)
         recipe.tags.set(tags)
         return super().update(recipe, validated_data)
+
+    def representation(self, recipe):
+        return RecipeSerializer(
+            recipe,
+            context={'request': self.context.get('request')}
+        ).data
 
 
 class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
