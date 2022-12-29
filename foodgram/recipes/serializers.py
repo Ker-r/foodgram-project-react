@@ -29,7 +29,7 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientAmount
-        fields = ('__all__')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class AddIngredientNumderSerializer(serializers.ModelSerializer):
@@ -69,7 +69,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = (
             'id', 'tags', 'author', 'ingredients', 'favorite',
-            'shop', 'name', 'text', 'cooking_time'
+            'shop', 'name', 'image', 'text', 'cooking_time'
         )
 
     @staticmethod
@@ -95,7 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeFullSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     author = CurrentUserSerializer(read_only=True)
-    ingredients = AddIngredientNumderSerializer(many=True)
+    ingredients = IngredientNumderSerializer(read_only=True, many=True, source='ingredientamount_set')
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
@@ -169,12 +169,6 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         self.add_ingredients(ingredients, recipe)
         recipe.tags.set(tags)
         return super().update(recipe, validated_data)
-
-    def representation(self, recipe):
-        return RecipeSerializer(
-            recipe,
-            context={'request': self.context.get('request')}
-        ).data
 
 
 class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
