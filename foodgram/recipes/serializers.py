@@ -40,7 +40,7 @@ class AddIngredientNumderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientAmount
-        fields = ('__all__')
+        fields = ('id', 'amount')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -95,7 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeFullSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     author = CurrentUserSerializer(read_only=True)
-    ingredients = AddIngredientNumderSerializer(many=True, source='ingredientamount_set')
+    ingredients = AddIngredientNumderSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
@@ -154,7 +154,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         author = self.context.get('request').user
         tags_data = validated_data.pop('tags')
-        ingredient_data = validated_data.pop('ingredientamount_set')
+        ingredient_data = validated_data.pop('ingredients')
         image = validated_data.pop('image')
         recipe = Recipe.objects.create(image=image, author=author,
                                        **validated_data)
@@ -170,11 +170,11 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags)
         return super().update(recipe, validated_data)
 
-    def representation(self, recipe):
-        return RecipeSerializer(
-            recipe,
-            context={'request': self.context.get('request')}
-        ).data
+    def to_representation(self, instance):
+        self.fields.pop('ingredients', None)
+        rep = super().to_representation(instance)
+        rep['ingredients'] = AddIngredientNumderSerializer(IngredientAmount.objects.filter(recipe=instance).all(), many=True)
+        return rep
 
 
 class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
