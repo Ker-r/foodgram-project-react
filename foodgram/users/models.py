@@ -4,6 +4,8 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     email = models.EmailField('email', null=False, unique=True)
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
@@ -14,6 +16,13 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f'Пользователь {self.email}'
 
+    @property
+    def is_moderator(self):
+        return self.is_staff or self.role == self.MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.is_superuser or self.role == self.ADMIN
 
 User = CustomUser
 
