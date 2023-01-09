@@ -17,7 +17,11 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ('__all__')
+        fields = (
+            'id',
+            'name',
+            'measurement_unit',
+        )
 
 
 class IngredientNumderSerializer(serializers.ModelSerializer):
@@ -29,7 +33,7 @@ class IngredientNumderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientAmount
-        fields = ('id', 'name', 'measurement_unit', 'amount')
+        fields = ('__all__')
 
 
 class AddIngredientNumderSerializer(serializers.ModelSerializer):
@@ -40,7 +44,7 @@ class AddIngredientNumderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientAmount
-        fields = ('__all__')
+        fields = ('id', 'amount')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -110,22 +114,22 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        ingredients = data.get('ingredients')
-        for ingredient in ingredients:
-            if not Ingredient.objects.filter(
-                    id=ingredient['id']).exists():
-                raise serializers.ValidationError(
-                    {'ingredients': 'Данного ингридиента нет в базе'}
-                )
+        #ingredients = data.get('ingredients')
+        # for ingredient in ingredients:
+        #     if not Ingredient.objects.filter(
+        #             id=ingredient['id']).exists():
+        #         raise serializers.ValidationError(
+        #             {'ingredients': 'Данного ингридиента нет в базе'}
+        #         )
         tags = data.get('tags')
         if len(tags) != len(set([item for item in tags])):
             raise serializers.ValidationError(
                 {'tags': 'Тэги не могут повторяться'}
             )
-        if len(ingredients) != len(set([item['id'] for item in ingredients])):
-            raise serializers.ValidationError(
-                'Ингредиенты не должны повторяться'
-            )
+        # if len(ingredients) != len(set([item['id'] for item in ingredients])):
+        #     raise serializers.ValidationError(
+        #         'Ингредиенты не должны повторяться'
+        #     )
         cooking_time = data.get('cooking_time')
         if cooking_time > 300 or cooking_time < 1:
             raise serializers.ValidationError(
@@ -162,6 +166,13 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags_data)
         return recipe
 
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return RecipeSerializer(instance, context=context).data
+
+
     def update(self, recipe, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -170,11 +181,6 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags)
         return super().update(recipe, validated_data)
 
-    def representation(self, recipe):
-        return RecipeSerializer(
-            recipe,
-            context={'request': self.context.get('request')}
-        ).data
 
 
 class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
