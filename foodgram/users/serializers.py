@@ -35,7 +35,7 @@ class UserFollowSerializer(serializers.ModelSerializer):
             )
         return data
 
-    def representation(self, instance):
+    def to_representation(self, instance):
         request = self.context.get('request')
         return FollowSerializer(
             instance.following,
@@ -89,10 +89,11 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             'email', 'id', 'username', 'first_name', 'last_name',
             'is_signed'
         )
+        extra_kwargs = {"password": {'write_only': True}}
 
     def get_is_signed(self, obj):
         request = self.context.get('request')
-        if not request or request.user.is_anonymous:
+        if request is None or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=self.context['request'].user,
-                                     following=obj).exists()
+        user = request.user
+        return Follow.objects.filter(following=obj, user=user).exists()

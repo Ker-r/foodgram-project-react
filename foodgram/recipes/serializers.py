@@ -83,7 +83,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_favorite(self, obj):
         request = self.context.get('request')
-        if not request or request.user.is_annonymous:
+        if not request or request.user.is_anonymous:
             return False
         user = request.user
         return FavoriteRecipe.objects.filter(recipe=obj, user=user).exists()
@@ -199,7 +199,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
             message='Рецепт уже добавлен в избранное'
         )]
 
-    def representation(self, instance):
+    def to_representation(self, instance):
         request = self.context.get('request')
         return RecipeImageSerializer(
             instance.recipe,
@@ -218,7 +218,7 @@ class ShopSerializer(FavoriteSerializer):
             message='Рецепт уже добавлен в список покупок'
         )]
 
-    def representation(self, instance):
+    def to_representation(self, instance):
         request = self.context.get('request')
         return RecipeImageSerializer(
             instance.recipe,
