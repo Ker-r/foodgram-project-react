@@ -24,6 +24,7 @@ class CustomUser(AbstractUser):
     def is_admin(self):
         return self.is_superuser or self.role == self.ADMIN
 
+
 User = CustomUser
 
 
