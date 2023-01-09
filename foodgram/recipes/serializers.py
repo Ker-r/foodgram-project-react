@@ -114,7 +114,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        #ingredients = data.get('ingredients')
+        # ingredients = data.get('ingredients')
         # for ingredient in ingredients:
         #     if not Ingredient.objects.filter(
         #             id=ingredient['id']).exists():
