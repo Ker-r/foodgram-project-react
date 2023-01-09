@@ -4,8 +4,20 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     email = models.EmailField('email', null=False, unique=True)
+    USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
+    ROLES = {
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin'),
+    }
+    role = models.CharField(
+        verbose_name='статус',
+        max_length=20,
+        choices=ROLES,
+        default=USER,
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
