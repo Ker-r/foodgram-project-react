@@ -166,12 +166,10 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags_data)
         return recipe
 
-
     def to_representation(self, instance):
         request = self.context.get('request')
         context = {'request': request}
         return RecipeSerializer(instance, context=context).data
-
 
     def update(self, recipe, validated_data):
         ingredients = validated_data.pop('ingredients')
@@ -180,7 +178,6 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         self.add_ingredients(ingredients, recipe)
         recipe.tags.set(tags)
         return super().update(recipe, validated_data)
-
 
 
 class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
