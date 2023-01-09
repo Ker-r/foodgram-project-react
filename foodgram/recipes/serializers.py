@@ -81,7 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = IngredientAmount.objects.filter(recipe=obj)
         return IngredientNumderSerializer(ingredients, many=True).data
 
-    def get_favorited(self, obj):
+    def get_favorite(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_annonymous:
             return False
