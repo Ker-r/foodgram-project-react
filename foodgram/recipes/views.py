@@ -1,8 +1,7 @@
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,12 +10,12 @@ from foodgram.pagination import LimitPageNumberPaginator
 from .filters import IngredientFilter, RecipeFilter
 from .models import (
     Ingredient, IngredientAmount,
-    Recipe, Tag
+    Recipe, Tag, FavoriteRecipe, Shop
 )
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdmin
 from .serializers import (
     IngredientSerializer, RecipeSerializer,
-    RecipeFullSerializer, TagSerializer, RecipeImageSerializer
+    RecipeFullSerializer, TagSerializer, ShopSerializer, FavoriteSerializer
 )
 from .services import download_file
 
@@ -45,32 +44,58 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.serializer_classes.get(self.action,
                                            self.default_serializer_class)
 
-    def _favorite_shopping_post_delete(self, related_manager):
-        recipe = self.get_object()
-        if self.request.method == 'DELETE':
-            related_manager.get(recipe_id=recipe.id).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        if related_manager.filter(recipe=recipe).exists():
-            raise ValidationError('Рецепт уже в избранном')
-        related_manager.create(recipe=recipe)
-        serializer = RecipeImageSerializer(instance=recipe)
+
+class FavoriteApiView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, favorite_id):
+        user = request.user
+        data = {
+            'recipe': favorite_id,
+            'user': user.id
+        }
+        serializer = FavoriteSerializer(data=data,
+                                        context={'request': request})
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True,
-            permission_classes=[permissions.IsAuthenticated],
-            methods=['POST', 'DELETE'], )
-    def favorite(self, request, pk=None):
-        return self._favorite_shopping_post_delete(
-            request.user.favorite
-        )
+    def delete(self, request, favorite_id):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=favorite_id)
+        FavoriteRecipe.objects.filter(user=user, recipe=recipe).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True,
-            permission_classes=[permissions.IsAuthenticated],
-            methods=['POST', 'DELETE'], )
-    def shopping_cart(self, request, pk=None):
-        return self._favorite_shopping_post_delete(
-            request.user.shopping_user
-        )
+
+class ShoppingView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, recipe_id):
+        user = request.user
+        data = {
+            'recipe': recipe_id,
+            'user': user.id
+        }
+        context = {'request': request}
+        serializer = ShopSerializer(data=data,
+                                            context=context)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, recipe_id):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        Shop.objects.filter(user=user, recipe=recipe).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

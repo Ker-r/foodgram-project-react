@@ -209,7 +209,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 class ShopSerializer(FavoriteSerializer):
 
-    class Meta:
+    class Meta(FavoriteSerializer.Meta):
         mosel = Shop
         fields = '__all__'
         validators = [UniqueTogetherValidator(
