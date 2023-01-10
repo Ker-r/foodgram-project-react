@@ -81,8 +81,7 @@ class ShoppingView(APIView):
             'user': user.id
         }
         context = {'request': request}
-        serializer = ShopSerializer(data=data,
-                                            context=context)
+        serializer = ShopSerializer(data=data, context=context)
         if not serializer.is_valid():
             return Response(
                 serializer.errors,
