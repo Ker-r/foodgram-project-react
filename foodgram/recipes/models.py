@@ -144,52 +144,58 @@ class IngredientAmount(models.Model):
 
 
 class FavoriteRecipe(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='recipe_favorite',
-        verbose_name='Пользователь'
-    )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe_favorite',
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
+        related_name='in_favorite',
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        related_name='favorite',
     )
 
     class Meta:
-        verbose_name = 'Избранный рецепт'
-        verbose_name_plural = 'Избранные рецепты'
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='unique favourite')]
+                fields=('recipe', 'user'),
+                name='unique_favorite',
+            ),
+        )
+        ordering = ('-id',)
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные рецепты'
 
     def __str__(self):
-        return f'Избранный рецепт: "{self.user}"'
+        return f'Рецепт {self.recipe} в избранном пользователя {self.user}'
 
 
 class Shop(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='buy',
-        verbose_name='Пользователь'
-    )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='buy',
-        verbose_name='Покупка'
+        verbose_name='Рецепт',
+        related_name='shopping_recipe'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        related_name='shopping_user',
     )
 
     class Meta:
-        verbose_name = 'Покупка'
-        verbose_name_plural = 'Покупки'
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'recipe'],
-                                    name='unique_shop')
-        ]
+        constraints = (
+            models.UniqueConstraint(
+                fields=('recipe', 'user'),
+                name='shopping_recipe_user_exists',
+            ),
+        )
+        ordering = ('-id',)
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
 
     def __str__(self):
-        return f'Покупка: "{self.user}"'
+        return f'Рецепт {self.recipe} у пользователя {self.user}'
