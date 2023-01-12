@@ -1,19 +1,16 @@
-# from django.db.models import Sum
-from django.http import HttpResponse
-from django.template.loader import render_to_string
+from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from weasyprint import HTML
-# from rest_framework.views import APIView
+from rest_framework.views import APIView
 
 from foodgram.pagination import LimitPageNumberPaginator
 from .filters import IngredientFilter, RecipeFilter
 from .models import (
-    Ingredient,
+    Ingredient, IngredientAmount,
     Recipe, Tag
 )
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdmin
@@ -21,7 +18,7 @@ from .serializers import (
     IngredientSerializer, RecipeSerializer,
     RecipeFullSerializer, TagSerializer
 )
-from .services import get_list_ingredients
+from .services import download_file
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -75,18 +72,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request.user.shopping_user
         )
 
-    @action(detail=False)
-    def download_shopping_cart(self, request):
-        ingredients = get_list_ingredients(request.user)
-        html_template = render_to_string('recipes/pdf_template.html',
-                                         {'ingredients': ingredients})
-        html = HTML(string=html_template)
-        result = html.write_pdf()
-        response = HttpResponse(result, content_type='application/pdf;')
-        response['Content-Disposition'] = 'inline; filename=shopping_list.pdf'
-        response['Content-Transfer-Encoding'] = 'binary'
-        return response
-
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
@@ -95,13 +80,13 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-# class DownloadShop(APIView):
-#     permission_classes = [IsAuthenticated, ]
+class DownloadShop(APIView):
+    permission_classes = [IsAuthenticated, ]
 
-#     def get(self, request):
-#         ingredients = IngredientAmount.objects.filter(
-#             recipe__shop__user=request.user).values(
-#                 'ingredient__name', 'ingredient__measurement_unit').order_by(
-#                     'ingredient__name').annotate(
-#                         ingredient_total=Sum('amount'))
-#         return download_file(ingredients)
+    def get(self, request):
+        ingredients = IngredientAmount.objects.filter(
+            recipe__shop__user=request.user).values(
+                'ingredient__name', 'ingredient__measurement_unit').order_by(
+                    'ingredient__name').annotate(
+                        ingredient_total=Sum('amount'))
+        return download_file(ingredients)
