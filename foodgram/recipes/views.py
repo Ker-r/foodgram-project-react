@@ -1,17 +1,15 @@
-import datetime
-from django.shortcuts import HttpResponse
+from django.db.models import Sum
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from foodgram.pagination import LimitPageNumberPaginator
 from .filters import IngredientFilter, RecipeFilter
 from .models import (
-    Ingredient, IngredientAmount,
+    Ingredient,
     Recipe, Tag
 )
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdmin
@@ -73,6 +71,35 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request.user.shopping_user
         )
 
+    @action(
+        detail=False,
+        methods=('get',),
+        url_path='download_shopping_cart',
+        pagination_class=None)
+    def download_file(self, request):
+        user = request.user
+        if not user.shopping_cart.exists():
+            return Response(
+                'В корзине нет товаров', status=status.HTTP_400_BAD_REQUEST)
+
+        text = 'Список покупок:\n\n'
+        ingredient_name = 'recipe__recipe__ingredient__name'
+        ingredient_unit = 'recipe__recipe__ingredient__measurement_unit'
+        recipe_amount = 'recipe__recipe__amount'
+        amount_sum = 'recipe__recipe__amount__sum'
+        cart = user.shopping_cart.select_related('recipe').values(
+            ingredient_name, ingredient_unit).annotate(Sum(
+                recipe_amount)).order_by(ingredient_name)
+        for _ in cart:
+            text += (
+                f'{_[ingredient_name]} ({_[ingredient_unit]})'
+                f' — {_[amount_sum]}\n'
+            )
+        response = HttpResponse(text, content_type='text/plain')
+        filename = 'shopping_list.txt'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
+
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
@@ -81,30 +108,30 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class DownloadShop(APIView):
-    permission_classes = [IsAuthenticated, ]
+# class DownloadShop(APIView):
+#     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request):
-        shopping_list = {}
-        ingredients = IngredientAmount.objects.filter(
-            recipe__purchases__user=request.user
-        )
-        for ingredient in ingredients:
-            amount = ingredient.amount
-            name = ingredient.ingredient.name
-            measurement_unit = ingredient.ingredient.measurement_unit
-            if name not in shopping_list:
-                shopping_list[name] = {
-                    'measurement_unit': measurement_unit,
-                    'amount': amount
-                }
-            else:
-                shopping_list[name]['amount'] += amount
-        main_list = ([f"* {item}:{value['amount']}"
-                      f"{value['measurement_unit']}\n"
-                      for item, value in shopping_list.items()])
-        today = datetime.date.today()
-        main_list.append(f'\n From FoodGram with love, {today.year}')
-        response = HttpResponse(main_list, 'Content-Type: text/plain')
-        response['Content-Disposition'] = 'attachment; filename="BuyList.txt"'
-        return response
+#     def get(self, request):
+#         shopping_list = {}
+#         ingredients = IngredientAmount.objects.filter(
+#             recipe__purchases__user=request.user
+#         )
+#         for ingredient in ingredients:
+#             amount = ingredient.amount
+#             name = ingredient.ingredient.name
+#             measurement_unit = ingredient.ingredient.measurement_unit
+#             if name not in shopping_list:
+#                 shopping_list[name] = {
+#                     'measurement_unit': measurement_unit,
+#                     'amount': amount
+#                 }
+#             else:
+#                 shopping_list[name]['amount'] += amount
+#         main_list = ([f"* {item}:{value['amount']}"
+#                       f"{value['measurement_unit']}\n"
+#                       for item, value in shopping_list.items()])
+#         today = datetime.date.today()
+#         main_list.append(f'\n From FoodGram with love, {today.year}')
+#         response = HttpResponse(main_list, 'Content-Type: text/plain')
+#         response['Content-Disposition'] = 'attachment; filename="BuyList.txt
+#         return response
