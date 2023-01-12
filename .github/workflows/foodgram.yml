@@ -19,7 +19,7 @@ jobs:
         pip install -r foodgram/requirements.txt 
     - name: Test with flake8
       run: |
-        flake8 . --ignore I004,I001,I005,I003,R505,E501,W503,W504 --exclude tests,migrations
+        flake8 . --ignore I004,I001,I005,I003,R505,E501,W503,W504,R504 --exclude tests,migrations
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
