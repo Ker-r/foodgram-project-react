@@ -42,3 +42,5 @@ sqlparse==0.4.1
 uritemplate==3.0.1
 urllib3==1.26.6
 weasyprint==52.5
+CairoSVG==2.5.2
+cairocffi==1.3.0
