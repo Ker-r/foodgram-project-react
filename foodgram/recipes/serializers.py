@@ -126,7 +126,7 @@ class RecipeFullSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'tags': 'Тэги не могут повторяться'}
             )
-        # if len(ingredients) != len(set([item['id'] for item in ingredients])):
+        # if len(ingredients) != len(set([item['id'] for item in ingredients]))
         #     raise serializers.ValidationError(
         #         'Ингредиенты не должны повторяться'
         #     )

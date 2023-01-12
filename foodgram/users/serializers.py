@@ -89,7 +89,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             'email', 'id', 'username', 'first_name', 'last_name',
             'is_signed'
         )
-        extra_kwargs = {"password": {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}}
 
     def get_is_signed(self, obj):
         request = self.context.get('request')
