@@ -1,4 +1,5 @@
-from django.db.models import Sum
+import datetime
+from django.shortcuts import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -18,7 +19,7 @@ from .serializers import (
     IngredientSerializer, RecipeSerializer,
     RecipeFullSerializer, TagSerializer
 )
-from .services import download_file
+# from .services import download_file
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -84,9 +85,26 @@ class DownloadShop(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
+        shopping_list = {}
         ingredients = IngredientAmount.objects.filter(
-            recipe__shop__user=request.user).values(
-                'ingredient__name', 'ingredient__measurement_unit').order_by(
-                    'ingredient__name').annotate(
-                        ingredient_total=Sum('amount'))
-        return download_file(ingredients)
+            recipe__purchases__user=request.user
+        )
+        for ingredient in ingredients:
+            amount = ingredient.amount
+            name = ingredient.ingredient.name
+            measurement_unit = ingredient.ingredient.measurement_unit
+            if name not in shopping_list:
+                shopping_list[name] = {
+                    'measurement_unit': measurement_unit,
+                    'amount': amount
+                }
+            else:
+                shopping_list[name]['amount'] += amount
+        main_list = ([f"* {item}:{value['amount']}"
+                      f"{value['measurement_unit']}\n"
+                      for item, value in shopping_list.items()])
+        today = datetime.date.today()
+        main_list.append(f'\n From FoodGram with love, {today.year}')
+        response = HttpResponse(main_list, 'Content-Type: text/plain')
+        response['Content-Disposition'] = 'attachment; filename="BuyList.txt"'
+        return response
