@@ -1,16 +1,16 @@
-from django.db.models import Sum
+from io import StringIO
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from foodgram.pagination import LimitPageNumberPaginator
 from .filters import IngredientFilter, RecipeFilter
 from .models import (
-    Ingredient, IngredientAmount,
+    Ingredient,
     Recipe, Tag
 )
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdmin
@@ -18,7 +18,7 @@ from .serializers import (
     IngredientSerializer, RecipeSerializer,
     RecipeFullSerializer, TagSerializer
 )
-from .services import download_file
+from .services import get_header_message, get_total_list
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -81,12 +81,21 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class DownloadShop(APIView):
-    permission_classes = [IsAuthenticated, ]
-
     def get(self, request):
-        ingredients = IngredientAmount.objects.filter(
-            recipe__purchases__user=request.user).values(
-                'ingredient__name', 'ingredient__measurement_unit').order_by(
-                    'ingredient__name').annotate(
-                        ingredient_total=Sum('amount'))
-        return download_file(ingredients)
+        user = request.user
+        queryset = user.shopping_cart.select_related('recipe').all()
+        message = get_header_message(queryset)
+        total_list = get_total_list(queryset)
+
+        f = StringIO()
+        f.name = 'shopping-list.txt'
+        f.write(f'{message}\n\n')
+        for k, v in total_list.items():
+            for unit, amount in v.items():
+                f.write(f'{k}: {amount} {unit}\n')
+
+        response = HttpResponse(f.getvalue(), content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={f.name}'
+        user.shopping_cart.all().delete()
+
+        return response
