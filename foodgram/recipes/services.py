@@ -1,20 +1,10 @@
 def get_header_message(queryset):
-    """
-    Готовит заголовок для списка покупок из перечня рецептов.
-    На вход поступает queryset экземпляров модели ShoppingCart.
-    """
 
-    recipes_list = (", ".join([cart.recipe.name for cart in queryset]))
+    recipes_list = (', '.join([cart.recipe.name for cart in queryset]))
     return f'Вы добавили в корзину ингредиенты для: {recipes_list}.'
 
 
 def get_total_list(queryset):
-    """
-    Формирует список покупок.
-    На вход поступает queryset экземпляров модели ShoppingCart.
-    Повторяющиеся ингредиенты суммируются.
-    Структура списка - {'ингредиент': {'ед.изм.': 'количество'}.
-    """
 
     total_list = {}
 
