@@ -83,7 +83,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class DownloadShop(APIView):
     def get(self, request):
         user = request.user
-        queryset = user.shopping_cart.select_related('recipe').all()
+        queryset = user.shopping_user.select_related('recipe').all()
         message = get_header_message(queryset)
         total_list = get_total_list(queryset)
 
@@ -96,6 +96,6 @@ class DownloadShop(APIView):
 
         response = HttpResponse(f.getvalue(), content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={f.name}'
-        user.shopping_cart.all().delete()
+        user.shopping_user.all().delete()
 
         return response
