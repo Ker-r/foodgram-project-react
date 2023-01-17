@@ -1,19 +1,19 @@
 import datetime
 from django.shortcuts import HttpResponse
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from foodgram.pagination import LimitPageNumberPaginator
 from .filters import IngredientFilter, RecipeFilter
 from .models import (
     Ingredient, IngredientAmount,
-    Recipe, Tag, Shop
+    Recipe, Tag
 )
-from users.models import User
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdmin
 from .serializers import (
     IngredientSerializer, RecipeSerializer,
@@ -73,40 +73,38 @@ class RecipeViewSet(viewsets.ModelViewSet):
             request.user.shopping_user
         )
 
-    @action(methods=['get'], detail=False, url_path='download_shopping_cart')
-    def load_shop_list(self, request):
-        """Функция скачивания листа покупок в файле txt."""
-        user = get_object_or_404(User, username=request.user)
-        recipes_id = Shop.objects.filter(user=user).values('recipe')
-        recipes = Recipe.objects.filter(pk__in=recipes_id)
-        shop_dict = {}
-        n_rec = 0
-        for recipe in recipes:
-            n_rec += 1
-            ing_amounts = IngredientAmount.objects.filter(recipe=recipe)
-            for ing in ing_amounts:
-                if ing.ingredient.name in shop_dict:
-                    shop_dict[ing.ingredient.name][0] += ing.amount
-                else:
-                    shop_dict[ing.ingredient.name] = [
-                        ing.amount,
-                        ing.ingredient.measurement_unit
-                    ]
-        now = datetime.datetime.now()
-        now = now.strftime("%d-%m-%Y")
-        shop_string = (
-            f'FoodGram\nВыбрано рецептов: {n_rec}\
-            \n-------------------\n{now}\
-            \nСписок покупок:\
-            \n-------------------'
-        )
-        for key, value in shop_dict.items():
-            shop_string += f'\n{key} ({value[1]}) - {str(value[0])}'
-        return HttpResponse(shop_string, content_type='text/plain')
-
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Tag.objects.all()
     pagination_class = None
+
+
+class DownloadShop(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        shopping_list = {}
+        ingredients = IngredientAmount.objects.filter(
+            recipe__purchases__user=request.user
+        )
+        for ingredient in ingredients:
+            amount = ingredient.amount
+            name = ingredient.ingredient.name
+            measurement_unit = ingredient.ingredient.measurement_unit
+            if name not in shopping_list:
+                shopping_list[name] = {
+                    'measurement_unit': measurement_unit,
+                    'amount': amount
+                }
+            else:
+                shopping_list[name]['amount'] += amount
+        main_list = ([f"* {item}:{value['amount']}"
+                      f"{value['measurement_unit']}\n"
+                      for item, value in shopping_list.items()])
+        today = datetime.date.today()
+        main_list.append(f'\n From FoodGram with love, {today.year}')
+        response = HttpResponse(main_list, 'Content-Type: text/plain')
+        response['Content-Disposition'] = 'attachment; filename="BuyList.txt"'
+        return response
