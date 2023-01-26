@@ -114,22 +114,11 @@ class RecipeFullSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        # ingredients = data.get('ingredients')
-        # for ingredient in ingredients:
-        #     if not Ingredient.objects.filter(
-        #             id=ingredient['id']).exists():
-        #         raise serializers.ValidationError(
-        #             {'ingredients': 'Данного ингридиента нет в базе'}
-        #         )
         tags = data.get('tags')
         if len(tags) != len(set([item for item in tags])):
             raise serializers.ValidationError(
                 {'tags': 'Тэги не могут повторяться'}
             )
-        # if len(ingredients) != len(set([item['id'] for item in ingredients]))
-        #     raise serializers.ValidationError(
-        #         'Ингредиенты не должны повторяться'
-        #     )
         cooking_time = data.get('cooking_time')
         if cooking_time > 300 or cooking_time < 1:
             raise serializers.ValidationError(
@@ -191,11 +180,11 @@ class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
 class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('user', 'recipe')
+        fields = ('favorite', 'in_favorite')
         model = FavoriteRecipe
         validators = [UniqueTogetherValidator(
             queryset=FavoriteRecipe.objects.all(),
-            fields=('user', 'recipe'),
+            fields=('favorite', 'in_favorite'),
             message='Рецепт уже добавлен в избранное'
         )]
 
@@ -210,11 +199,11 @@ class FavoriteSerializer(serializers.ModelSerializer):
 class ShopSerializer(FavoriteSerializer):
 
     class Meta(FavoriteSerializer.Meta):
-        mosel = Shop
+        model = Shop
         fields = '__all__'
         validators = [UniqueTogetherValidator(
             queryset=Shop.objects.all(),
-            fields=('user', 'recipe'),
+            fields=('shopping_recipe', 'shopping_user'),
             message='Рецепт уже добавлен в список покупок'
         )]
 
