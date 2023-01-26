@@ -179,14 +179,6 @@ class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-    )
-    recipe = serializers.PrimaryKeyRelatedField(
-        queryset=Recipe.objects.all(),
-        write_only=True,
-    )
 
     class Meta:
         fields = ('favorite', 'in_favorite')
