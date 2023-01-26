@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 
@@ -178,6 +179,14 @@ class ShowFavoriteRecipeShopListSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+    )
+    recipe = serializers.PrimaryKeyRelatedField(
+        queryset=Recipe.objects.all(),
+        write_only=True,
+    )
 
     class Meta:
         fields = ('favorite', 'in_favorite')
@@ -197,19 +206,27 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class ShopSerializer(FavoriteSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
 
-    class Meta(FavoriteSerializer.Meta):
+    class Meta:
         model = Shop
-        fields = '__all__'
-        validators = [UniqueTogetherValidator(
-            queryset=Shop.objects.all(),
-            fields=('shopping_recipe', 'shopping_user'),
-            message='Рецепт уже добавлен в список покупок'
-        )]
+        fields = ('shopping_user', 'shopping_recipe')
+
+    def validate(self, data):
+        user = data['shopping_user']
+        recipe_id = data['shopping_recipe'].id
+        if Shop.objects.filter(user=user,
+                               recipe__id=recipe_id).exists():
+            raise ValidationError(
+                'Рецепт уже добавлен в корзину!'
+            )
+        return data
 
     def to_representation(self, instance):
         request = self.context.get('request')
-        return RecipeImageSerializer(
+        context = {'request': request}
+        return ShowFavoriteRecipeShopListSerializer(
             instance.recipe,
-            context={'request': request}
+            context=context
         ).data
