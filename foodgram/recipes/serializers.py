@@ -198,8 +198,6 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class ShopSerializer(FavoriteSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
 
     class Meta:
         model = Shop
