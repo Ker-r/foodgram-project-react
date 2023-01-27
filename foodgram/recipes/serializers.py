@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 
@@ -198,25 +197,29 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class ShopSerializer(FavoriteSerializer):
+    id = serializers.ReadOnlyField(
+        source='recipe.id',
+    )
+    name = serializers.ReadOnlyField(
+        source='recipe.name',
+    )
+    image = serializers.CharField(
+        source='recipe.image',
+        read_only=True,
+    )
+    cooking_time = serializers.ReadOnlyField(
+        source='recipe.cooking_time',
+    )
 
     class Meta:
         model = Shop
-        fields = ('shopping_user', 'shopping_recipe')
+        fields = ('id', 'name', 'image', 'cooking_time')
 
     def validate(self, data):
-        user = data['shopping_user']
-        recipe_id = data['shopping_recipe'].id
+        user = self.context.get('request').user
+        recipe = self.context.get('recipe_id')
         if Shop.objects.filter(user=user,
-                               recipe__id=recipe_id).exists():
-            raise ValidationError(
-                'Рецепт уже добавлен в корзину!'
-            )
+                               recipe=recipe).exists():
+            raise serializers.ValidationError({
+                'errors': 'Рецепт уже добавлен в список покупок'})
         return data
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return ShowFavoriteRecipeShopListSerializer(
-            instance.recipe,
-            context=context
-        ).data
